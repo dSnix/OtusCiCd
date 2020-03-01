@@ -5,17 +5,19 @@ dotnet: 3.1
 
 env:
   #собирать будем одновременно в конфигурациях Debug и Release
+  global:
+    - PROJECT_NAME=OtusCiCd
   matrix:
-  - BUILD_ENV=Debug
-  - BUILD_ENV=Release
+    - BUILD_ENV=Debug
+    - BUILD_ENV=Release
 
 install:
   #скачать используемые nuget-пакеты
-  - dotnet restore src/OtusCiCd.sln
+  - dotnet restore src/${PROJECT_NAME}.sln
 
 script:
   #билд
-  - dotnet build src/OtusCiCd.sln -c ${BUILD_ENV}
+  - dotnet build src/${PROJECT_NAME}.sln -c ${BUILD_ENV}
   #запуск тестов из проекта с тестами + анализ покрытия кода тестами
   - dotnet test -c ${BUILD_ENV} --no-build src/OtusCiCdTests/OtusCiCdTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
@@ -30,13 +32,13 @@ notifications:
 
 before_deploy:
   #готовим бинарники к деплою в github releases
-  - tar -cavf OtusCiCd.${BUILD_ENV}.${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}.tar.gz src/OtusCiCd/bin/${BUILD_ENV}
+  - tar -cavf ${PROJECT_NAME}.${BUILD_ENV}.${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}.tar.gz src/${PROJECT_NAME}/bin/${BUILD_ENV}
 
 deploy:
   #деплоим архив в раздел github releases проекта
   provider: releases
   api_key: ${GITHUB_OAUTH_TOKEN}
-  file: OtusCiCd.${BUILD_ENV}.${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}.tar.gz
+  file: ${PROJECT_NAME}.${BUILD_ENV}.${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}.tar.gz
   skip_cleanup: true
   on:
     tags: true
