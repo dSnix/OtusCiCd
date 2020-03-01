@@ -1,6 +1,6 @@
 using System;
 
-namespace OtusCiCd
+namespace OtusCiCd.Models
 {
     public class WeatherForecast
     {
