@@ -4,7 +4,8 @@ mono: none
 dotnet: 3.1
 
 env:
- matrix:
+  #собирать будем одновременно в конфигурациях Debug и Release
+  matrix:
   - BUILD_ENV=Debug
   - BUILD_ENV=Release
 
@@ -28,12 +29,13 @@ notifications:
     on_failure: always #при падении билда всегда
 
 before_deploy:
+  #готовим бинарники к деплою в github releases
   - tar -cavf OtusCiCd.${BUILD_ENV}.${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}.tar.gz src/OtusCiCd/bin/${BUILD_ENV}
 
 deploy:
+  #деплоим архив в раздел github releases проекта
   provider: releases
   api_key: ${GITHUB_OAUTH_TOKEN}
-  file_glob: true
   file: OtusCiCd.${BUILD_ENV}.${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}.tar.gz
   skip_cleanup: true
   on:
