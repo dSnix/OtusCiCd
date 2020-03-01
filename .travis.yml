@@ -2,8 +2,18 @@ language: csharp
 mono: none
 dotnet: 3.1
 sudo: false
+
 install:
   - dotnet restore src/OtusCiCd.sln
+
 script:
   - dotnet build src/OtusCiCd.sln -c Release
   - dotnet test -c Release --no-build src/OtusCiCdTests/OtusCiCdTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+
+notifications:
+  email:
+    recipients:
+      - dsnix.kvv@gmail.com
+      - other@example.com
+    on_success: change
+    on_failure: always
