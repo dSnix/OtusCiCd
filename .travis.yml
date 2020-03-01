@@ -1,19 +1,40 @@
 language: csharp
+os: linux
 mono: none
 dotnet: 3.1
-sudo: false
+
+env:
+ matrix:
+  - BUILD_ENV=Debug
+  - BUILD_ENV=Release
 
 install:
+  #скачать используемые nuget-пакеты
   - dotnet restore src/OtusCiCd.sln
 
 script:
-  - dotnet build src/OtusCiCd.sln -c Release
-  - dotnet test -c Release --no-build src/OtusCiCdTests/OtusCiCdTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+  #билд
+  - dotnet build src/OtusCiCd.sln -c ${BUILD_ENV}
+  #запуск тестов из проекта с тестами + анализ покрытия кода тестами
+  - dotnet test -c ${BUILD_ENV} --no-build src/OtusCiCdTests/OtusCiCdTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
 notifications:
+  #уведомление на почту
   email:
     recipients:
       - dsnix.kvv@gmail.com
       - other@example.com
-    on_success: change
-    on_failure: always
+    on_success: change #при изменении статуса билда. первый успешный билд после неудачного
+    on_failure: always #при падении билда всегда
+
+before_deploy:
+  - tar -cavf OtusCiCd.${BUILD_ENV}.${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}.tar.gz src/OtusCiCd/bin/${BUILD_ENV}
+
+deploy:
+  provider: releases
+  api_key: "c4173ad1c082175e65492f3d3d34293c83828c4e"
+  file_glob: true
+  file: OtusCiCd.${BUILD_ENV}.${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}.tar.gz
+  skip_cleanup: true
+  on:
+    tags: true
