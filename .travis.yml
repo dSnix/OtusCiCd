@@ -32,7 +32,7 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key: "c4173ad1c082175e65492f3d3d34293c83828c4e"
+  api_key: ${GITHUB_OAUTH_TOKEN}
   file_glob: true
   file: OtusCiCd.${BUILD_ENV}.${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}.tar.gz
   skip_cleanup: true
